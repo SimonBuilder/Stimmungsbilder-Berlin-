@@ -11,7 +11,7 @@
 <meta property="og:type" content="website">
 <style>
   :root{
-    --pink:#dc5498;
+    --accent:#dc5498;
     --ink:#4a4a4a;
     --lockup-left:14.54%;
     --lockup-width:70.91%;
@@ -51,7 +51,7 @@
     width:100%;
     height:auto;
     overflow:visible;
-    color:var(--pink);
+    color:var(--accent);
   }
 
   .wordmark{
@@ -113,6 +113,14 @@
     .rule{stroke-dashoffset:0}
   }
 </style>
+<script>
+  /* Zufällige Akzentfarbe pro Seitenaufruf, aus den drei Projektfarben */
+  (function(){
+    var colors=["#20b3af","#c69e77","#dc5498"];
+    var pick=colors[Math.floor(Math.random()*colors.length)];
+    document.documentElement.style.setProperty("--accent",pick);
+  })();
+</script>
 </head>
 <body>
 <main>

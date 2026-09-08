@@ -32,22 +32,44 @@ keine empirische Datenerhebung.
 
 ## Deployment
 
-- GitHub-Repo → Cloudflare Pages, Framework „None", kein Build-Befehl.
-- Domain bei netcup registriert, Nameserver zeigen auf Cloudflare.
-- **Harte Grenze: 25 MiB pro Einzeldatei** bei Cloudflare Pages.
-- Cloudflares Bedingungen untersagen, den Dienst überwiegend für Video oder
-  große Nicht-HTML-Dateien zu nutzen. Mediendateien klein halten.
+- GitHub-Repo → **Netlify** (nicht Cloudflare Pages, siehe unten), Deploy über
+  „Import from GitHub", kein Build-Befehl, Publish directory `/` (Root).
+- Repo: [github.com/SimonBuilder/Stimmungsbilder-Berlin-](https://github.com/SimonBuilder/Stimmungsbilder-Berlin-)
+- Domain bei netcup registriert. Für Netlify müssen die Nameserver nicht
+  zwingend umgestellt werden — reicht auch ein DNS-Eintrag bei netcup, der auf
+  Netlify zeigt. Noch offen, welche Variante genutzt wird.
+- Ursprünglich war Cloudflare Pages vorgesehen (daher die alte 25-MiB-Regel
+  und der ToS-Hinweis zu Video/großen Dateien) — am 2026-09-08 spontan auf
+  Netlify gewechselt, weil das Cloudflare-Dashboard kurzzeitig nicht
+  erreichbar war und der Nutzer stattdessen direkt über Netlify deployt hat.
+  Netlifys eigene Limits (Bandbreite/Dateigröße auf dem Free-Tier) sind noch
+  nicht geprüft — vor dem Hochladen von Video/großen Medien in der aktuellen
+  Netlify-Doku nachsehen, nicht die alten Cloudflare-Zahlen annehmen.
 
 ## Gestaltung
 
 | Token | Wert |
 |---|---|
-| Pink (Markenfarbe) | `#DC5498` |
 | Hintergrund | `#FFFFFF` |
 | Kleiner Text | `#4A4A4A` |
 
-Kontrast Pink auf Weiß ist 3,73:1. Das reicht für großen Text, **nicht** für
-Fließtext. Kleine Schrift immer dunkelgrau, Pink nur als Akzent.
+### Akzentfarben (Schriftzug + Linie)
+
+Drei Projektfarben, bei jedem Seitenaufruf wird per JS eine zufällig gewählt
+(`--accent`-CSS-Variable, gesetzt in `index.html` vor dem ersten Rendern,
+damit es nicht flackert). Bleibt für die Dauer eines Seitenaufrufs fix, ändert
+sich erst beim nächsten Laden.
+
+| Farbe | Hex | Kontrast auf Weiß |
+|---|---|---|
+| Teal | `#20B3AF` | ~2,6:1 |
+| Beige | `#C69E77` | ~2,5:1 |
+| Pink | `#DC5498` | ~3,7:1 |
+
+Nur Pink erreicht die WCAG-Mindestgrenze für großen Text (3:1) knapp; Teal und
+Beige liegen darunter. Bewusst akzeptiert für den großen, dekorativen
+Schriftzug — für Fließtext (falls später ergänzt) trotzdem immer Dunkelgrau
+verwenden, nie eine der Akzentfarben.
 
 ### Position des Schriftzugs (aus dem Original-Banner gemessen)
 
