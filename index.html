@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de" class="is-intro">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Wir hören zu.</title>
-<meta name="description" content="Stimmungsbilder Berlin — ein Projekt entsteht. Demnächst mehr.">
+<meta name="description" content="Stimmungsbilder Berlin — eine interaktive Plakatkampagne zur Berlinwahl 2026.">
 <meta name="theme-color" content="#ffffff">
-<meta property="og:title" content="Wir hören zu.">
-<meta property="og:description" content="Stimmungsbilder Berlin — ein Projekt entsteht.">
-<meta property="og:type" content="website">
+<!-- Adobe Fonts, Webprojekt „wre2dze“ (Degular). Dateien dürfen nicht selbst gehostet werden. -->
+<link rel="preconnect" href="https://use.typekit.net" crossorigin>
+<link rel="stylesheet" href="https://use.typekit.net/wre2dze.css">
 <style>
   :root{
     --accent:#dc5498;
@@ -16,11 +16,20 @@
     --lockup-left:14.54%;
     --lockup-width:70.91%;
     --lockup-center-y:47.86%;
+    /* Galerie nach Designvorlage (1920×1080): Bilder oben bei 10 %, 63 % hoch */
+    --img-top:10.2svh;
+    --img-h:min(63.3svh,60vw);
+    --gap:clamp(12px,1.6vw,32px);
+    /* Linker Rand des ersten Bildes beim Öffnen (Vorlage: 10,4 %) */
+    --track-start:10.4vw;
+    /* Fußzeile und Infotext */
+    --edge:clamp(16px,1.9vw,40px);
+    --text:clamp(17px,2.05vw,46px);
   }
 
   *{box-sizing:border-box;margin:0;padding:0}
 
-  html,body{height:100%}
+  html.is-intro{overflow:hidden}
 
   body{
     background:#fff;
@@ -30,13 +39,19 @@
     color:var(--ink);
   }
 
-  main{
-    position:relative;
-    min-height:100svh;
-    min-height:100vh;
+  /* ---------- Intro: Schriftzug ---------- */
+
+  .intro{
+    position:fixed;
+    inset:0;
+    z-index:2;
+    cursor:pointer;
+    transition:opacity .45s ease, filter .45s ease;
   }
 
-  /* Der Schriftzug sitzt exakt auf den aus der PNG gemessenen Proportionen */
+  /* Auflösen: ausblenden und leicht unscharf werden */
+  .intro.is-leaving{opacity:0;filter:blur(8px)}
+
   .lockup{
     position:absolute;
     left:var(--lockup-left);
@@ -73,44 +88,165 @@
   @keyframes fade{to{opacity:1}}
   @keyframes draw{to{stroke-dashoffset:0}}
 
-  footer{
-    position:absolute;
-    left:var(--lockup-left);
-    right:var(--lockup-left);
-    bottom:4.2%;
+  /* ---------- Galerie: vertikal scrollen, horizontal bewegen ---------- */
+
+  .gallery{position:relative}
+
+  .stage{
+    position:sticky;
+    top:0;
+    height:100vh;
+    height:100svh;
+    overflow:hidden;
     display:flex;
-    gap:2rem;
-    font-size:.75rem;
-    letter-spacing:.02em;
+    align-items:flex-start;
+    padding-top:var(--img-top);
+  }
+
+  .track{
+    display:flex;
+    align-items:center;
+    gap:var(--gap);
+    will-change:transform;
+  }
+
+  .track figure{
+    flex:none;
     opacity:0;
-    animation:fade 1s ease-out 1.9s forwards;
+    transform:translateX(40px);
+    transition:opacity 1s ease, transform 1.2s cubic-bezier(.22,1,.36,1);
   }
 
-  footer a{
+  .track figure.is-in{opacity:1;transform:none}
+
+  .track img{
+    display:block;
+    height:var(--img-h);
+    width:auto;
+    background:#f2f2f2;
+    cursor:zoom-in;
+  }
+
+  .track figure:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+
+  /* ---------- Lightbox ---------- */
+
+  html.is-lightbox{overflow:hidden}
+
+  .lightbox{
+    position:fixed;
+    inset:0;
+    z-index:10;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:calc(var(--edge)*2 + var(--text)*.8) var(--edge);
+    background:#fff;
+    font-size:var(--text);
+    color:var(--accent);
+    cursor:zoom-out;
+  }
+
+  .lightbox[hidden]{display:none}
+
+  .lightbox img{
+    display:block;
+    max-width:100%;
+    max-height:100%;
+    width:auto;
+    height:auto;
+    object-fit:contain;
+  }
+
+  .lightbox .info-close{
+    position:absolute;
+    top:var(--edge);
+    right:var(--edge);
+    margin:0;
+  }
+
+  /* ---------- Fußzeile + Infotext ---------- */
+
+  .site-foot,
+  .info{
+    position:fixed;
+    left:0;
+    right:0;
+    bottom:0;
+    z-index:3;
+    padding:0 var(--edge) calc(var(--edge)*.75);
+    font-family:"degular",sans-serif;
+    font-weight:400;
+    font-size:var(--text);
+    line-height:1.17;
+    color:var(--accent);
+  }
+
+  .site-foot{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    opacity:0;
+    transition:opacity .9s ease;
+  }
+
+  .is-ready .site-foot{opacity:1}
+  .is-info .site-foot{opacity:0;visibility:hidden}
+
+  .site-foot h1{font:inherit}
+
+  .site-foot button,
+  .info-close{
+    font:inherit;
     color:inherit;
-    text-decoration:none;
-    border-bottom:1px solid rgba(0,0,0,.22);
-    padding-bottom:1px;
+    background:none;
+    border:0;
+    padding:0;
+    cursor:pointer;
   }
 
-  footer a:hover,
-  footer a:focus-visible{border-bottom-color:var(--pink);color:var(--pink)}
+  .site-foot button:focus-visible,
+  .info-close:focus-visible{outline:2px solid currentColor;outline-offset:4px}
+  /* Infotext: liegt unter den Bildern, auf kleinen Schirmen notfalls darüber */
+  .info{
+    display:flex;
+    gap:var(--edge);
+    align-items:flex-start;
+    padding-top:calc(var(--edge)*.6);
+    max-height:100svh;
+    overflow-y:auto;
+    background:#fff;
+  }
 
-  footer a:focus-visible{outline:2px solid var(--pink);outline-offset:4px;border-radius:1px}
+  .info[hidden]{display:none}
 
-  /* Schmale Bildschirme: Zeile darf breiter stehen, sonst wird sie unlesbar klein */
+  .info-text{flex:1;max-width:46em}
+  .info-text p + p{margin-top:1.17em}
+
+  .info-close{
+    flex:none;
+    width:.8em;
+    height:.8em;
+    margin-top:.2em;
+  }
+
+  .info-close svg{display:block;width:100%;height:100%}
+
   @media (max-width:700px){
     :root{
       --lockup-left:7%;
       --lockup-width:86%;
       --lockup-center-y:46%;
+      --img-top:18svh;
+      --track-start:var(--edge);
     }
-    footer{gap:1.25rem;font-size:.7rem;bottom:6%}
   }
 
   @media (prefers-reduced-motion:reduce){
-    .wordmark,.rule,footer{animation:none;opacity:1}
+    .wordmark,.rule{animation:none;opacity:1}
     .rule{stroke-dashoffset:0}
+    .intro,.track figure,.site-foot{transition:none}
+    .track figure{transform:none}
   }
 </style>
 <script>
@@ -123,7 +259,8 @@
 </script>
 </head>
 <body>
-<main>
+
+<div class="intro" id="intro">
   <div class="lockup">
     <svg viewBox="0 0 1270.88 203.13" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Wir hören zu.">
       <g class="wordmark">
@@ -142,6 +279,190 @@
       <line class="rule" pathLength="1" x1="0" y1="197.63" x2="1270.88" y2="197.63"/>
     </svg>
   </div>
+</div>
+
+<main>
+  <section class="gallery" id="gallery" aria-label="Fotos der Plakatkampagne zur Berlinwahl 2026">
+    <div class="stage">
+      <div class="track" id="track">
+        <figure><img src="Bilder/Stimmungsbilder_Berlin_Berlinwahl2026-04.jpg" width="2000" height="1326" fetchpriority="high" alt="Drei beschriebene Plakate auf Aufstellern am Martha-Ndumbe-Platz"></figure>
+        <figure><img src="Bilder/Stimmungsbilder_Berlin_Berlinwahl2026-06.jpg" width="2000" height="1326" loading="lazy" alt="Passantinnen und Passanten lesen und beschreiben die Plakate"></figure>
+        <figure><img src="Bilder/Stimmungsbilder_Berlin_Berlinwahl2026-07.jpg" width="2000" height="1326" loading="lazy" alt="Ein Mann schreibt mit einem Stift auf das Plakat „Was würdest du in deinem Kiez sofort verändern?“"></figure>
+        <figure><img src="Bilder/Stimmungsbilder_Berlin_Berlinwahl2026-05.jpg" width="2000" height="1326" loading="lazy" alt="Kinder schreiben auf das Plakat „Welche Themen kommen dir in der Politik zu kurz?“"></figure>
+        <figure><img src="Bilder/Stimmungsbilder_Berlin_Berlinwahl2026-01.jpg" width="1326" height="2000" loading="lazy" alt="Beschriebenes Plakat: „Was würdest du in deinem Kiez sofort verändern?“"></figure>
+        <figure><img src="Bilder/Stimmungsbilder_Berlin_Berlinwahl2026-02.jpg" width="1326" height="2000" loading="lazy" alt="Beschriebenes Plakat: „Was würde dein Vertrauen in die Politik stärken?“"></figure>
+        <figure><img src="Bilder/Stimmungsbilder_Berlin_Berlinwahl2026-03.jpg" width="1326" height="2000" loading="lazy" alt="Beschriebenes Plakat: „Welche Themen kommen dir in der Politik zu kurz?“"></figure>
+      </div>
+    </div>
+  </section>
 </main>
+
+<footer class="site-foot">
+  <h1>Stimmungsbilder Berlin</h1>
+  <button type="button" id="info-open" aria-expanded="false" aria-controls="info">info</button>
+</footer>
+
+<section class="info" id="info" aria-label="Über das Projekt" hidden>
+  <div class="info-text">
+    <p>Anlässlich der Berliner Wahl 2026 entstand am 5. September 2026 auf dem Martha-Ndumbe-Platz in Berlin-Wedding ein parteiunabhängiges Dialogformat mit dem Ziel, zuzuhören und individuelle Stimmen und Perspektiven neben der Wahl sichtbar zu machen – analog und handschriftlich.</p>
+    <p>Vielen Dank an alle Beteiligten für die Teilnahme und den wertvollen Austausch!</p>
+  </div>
+  <button type="button" class="info-close" id="info-close" aria-label="Info schließen">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 2 22 22M22 2 2 22" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>
+  </button>
+</section>
+
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Bild in voller Größe" hidden>
+  <img id="lightbox-img" src="" alt="">
+  <button type="button" class="info-close" id="lightbox-close" aria-label="Bild schließen">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 2 22 22M22 2 2 22" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>
+  </button>
+</div>
+
+<script>
+(function(){
+  var root=document.documentElement;
+  var intro=document.getElementById("intro");
+  var gallery=document.getElementById("gallery");
+  var track=document.getElementById("track");
+  var figures=track.querySelectorAll("figure");
+  var reduced=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* Zeiten in ms. Schriftzug + Linie sind nach ~2150 ms fertig,
+     danach steht er HOLD lang, dann löst er sich auf. */
+  var INTRO_END=reduced?0:2150;
+  var HOLD=1500;
+  var DISSOLVE=reduced?0:450;
+
+  var distance=0;
+  var introDone=false;
+
+  if("scrollRestoration" in history) history.scrollRestoration="manual";
+  window.scrollTo(0,0);
+
+  /* Erstes Bild mit festem Abstand links, das nächste läuft rechts an
+     (kein Weißraum). Am Ende bleibt rechts ein Rand so breit wie der Bildabstand. */
+  function layout(){
+    var vw=window.innerWidth;
+    track.style.paddingLeft="var(--track-start)";
+    track.style.paddingRight="0";
+    var gap=parseFloat(getComputedStyle(track).columnGap)||0;
+    /* offsetLeft statt scrollWidth: ignoriert den Einblend-Versatz (translateX) */
+    var lastFig=figures[figures.length-1];
+    distance=Math.max(0,lastFig.offsetLeft+lastFig.offsetWidth+gap-vw);
+    gallery.style.height=(distance+window.innerHeight)+"px";
+    update();
+  }
+
+  function update(){
+    var y=window.scrollY-gallery.offsetTop;
+    var x=Math.min(Math.max(y,0),distance);
+    track.style.transform="translate3d("+(-x)+"px,0,0)";
+    if(!introDone) return;
+    var edge=window.innerWidth*0.92;
+    for(var i=0;i<figures.length;i++){
+      if(figures[i].getBoundingClientRect().left<edge) figures[i].classList.add("is-in");
+    }
+  }
+
+  var ticking=false;
+  window.addEventListener("scroll",function(){
+    if(ticking) return;
+    ticking=true;
+    requestAnimationFrame(function(){ticking=false;update();});
+  },{passive:true});
+  window.addEventListener("resize",layout);
+
+  layout();
+
+  /* Intro löst sich automatisch auf – oder sofort bei Klick, Scrollen oder Taste */
+  var leaving=false;
+  var SKIP_EVENTS=["click","wheel","touchmove","keydown"];
+
+  function endIntro(){
+    if(leaving) return;
+    leaving=true;
+    clearTimeout(introTimer);
+    SKIP_EVENTS.forEach(function(t){window.removeEventListener(t,endIntro);});
+    intro.classList.add("is-leaving");
+    setTimeout(function(){
+      intro.style.display="none";
+      introDone=true;
+      figures[0].classList.add("is-in");
+      root.classList.remove("is-intro");
+      root.classList.add("is-ready");
+      update();
+    },DISSOLVE);
+  }
+
+  var introTimer=setTimeout(endIntro,INTRO_END+HOLD);
+  SKIP_EVENTS.forEach(function(t){window.addEventListener(t,endIntro,{passive:true});});
+
+  /* Infotext auf- und zuklappen */
+  var info=document.getElementById("info");
+  var openBtn=document.getElementById("info-open");
+  var closeBtn=document.getElementById("info-close");
+
+  function setInfo(open){
+    info.hidden=!open;
+    root.classList.toggle("is-info",open);
+    openBtn.setAttribute("aria-expanded",open);
+    (open?closeBtn:openBtn).focus();
+  }
+
+  openBtn.addEventListener("click",function(){setInfo(true);});
+  closeBtn.addEventListener("click",function(){setInfo(false);});
+  document.addEventListener("keydown",function(e){
+    if(e.key==="Escape"&&!info.hidden&&lightbox.hidden) setInfo(false);
+  });
+
+  /* Lightbox: Bild anklicken → volle Fenstergröße; schließen per ×, Klick oder Esc.
+     Pfeiltasten blättern. */
+  var lightbox=document.getElementById("lightbox");
+  var lbImg=document.getElementById("lightbox-img");
+  var lbClose=document.getElementById("lightbox-close");
+  var current=-1;
+  var lastFocus=null;
+
+  function showImage(i){
+    current=(i+figures.length)%figures.length;
+    var src=figures[current].querySelector("img");
+    lbImg.src=src.currentSrc||src.src;
+    lbImg.alt=src.alt;
+  }
+
+  function openLightbox(i){
+    lastFocus=document.activeElement;
+    showImage(i);
+    lightbox.hidden=false;
+    root.classList.add("is-lightbox");
+    lbClose.focus();
+  }
+
+  function closeLightbox(){
+    lightbox.hidden=true;
+    root.classList.remove("is-lightbox");
+    if(lastFocus) lastFocus.focus();
+  }
+
+  Array.prototype.forEach.call(figures,function(fig,i){
+    fig.tabIndex=0;
+    fig.setAttribute("role","button");
+    fig.setAttribute("aria-label","Bild vergrößern: "+fig.querySelector("img").alt);
+    fig.addEventListener("click",function(){if(introDone) openLightbox(i);});
+    fig.addEventListener("keydown",function(e){
+      if(e.key==="Enter"||e.key===" "){e.preventDefault();openLightbox(i);}
+    });
+  });
+
+  lightbox.addEventListener("click",closeLightbox);
+  document.addEventListener("keydown",function(e){
+    if(lightbox.hidden) return;
+    if(e.key==="Escape") closeLightbox();
+    else if(e.key==="ArrowRight") showImage(current+1);
+    else if(e.key==="ArrowLeft") showImage(current-1);
+  });
+})();
+</script>
 </body>
 </html>
